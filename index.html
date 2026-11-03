@@ -201,7 +201,19 @@
     .big-emoji { font-size: 2.6rem; line-height: 1; margin-bottom: 12px; }
     .choice-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin-top: 8px; }
     #noButton { white-space: normal; max-width: min(260px, calc(100vw - 30px)); line-height: 1.3; }
-    #noButton.escaping { position: fixed; z-index: 9999; margin: 0; transition: left .25s ease, top .25s ease; }
+    #noButton.escaping {
+      position: fixed; z-index: 9999; margin: 0;
+      transition: left .6s cubic-bezier(.22, 1, .36, 1), top .6s cubic-bezier(.22, 1, .36, 1);
+    }
+    /* A playful wiggle while it runs away */
+    #noButton.running { animation: scurry .6s ease-in-out; }
+    @keyframes scurry {
+      0%   { transform: rotate(0) scale(1); }
+      20%  { transform: rotate(-9deg) scale(.94); }
+      45%  { transform: rotate(7deg) scale(.96); }
+      70%  { transform: rotate(-4deg) scale(.98); }
+      100% { transform: rotate(0) scale(1); }
+    }
     /* "Sim" grows each time she tries "Não" */
     #convite[data-yes-step="1"] #yesButton { padding: 18px 32px; font-size: 1.1rem; }
     #convite[data-yes-step="2"] #yesButton { padding: 21px 38px; font-size: 1.25rem; }
@@ -649,12 +661,27 @@
 
     noButton.addEventListener('click', event => {
       event.preventDefault();
+      // First escape: pin the button exactly where it is now (no transition),
+      // so it visibly runs from the card instead of teleporting.
+      if (!noButton.classList.contains('escaping')) {
+        const start = noButton.getBoundingClientRect();
+        noButton.style.transition = 'none';
+        noButton.style.left = start.left + 'px';
+        noButton.style.top = start.top + 'px';
+        noButton.classList.add('escaping');
+        void noButton.offsetWidth; // commit the start position before animating
+        noButton.style.transition = '';
+      }
       state.noCount++;
       noButton.textContent = CONFIG.noMessages[(state.noCount - 1) % CONFIG.noMessages.length];
-      noButton.classList.add('escaping');
       convite.dataset.yesStep = String(yesStep(state.noCount));
+      // Restart the little "running" wiggle on every escape.
+      noButton.classList.remove('running');
+      void noButton.offsetWidth;
+      noButton.classList.add('running');
       placeNoButton();
     });
+    noButton.addEventListener('animationend', () => noButton.classList.remove('running'));
 
     window.addEventListener('resize', () => { if (state.noCount > 0) placeNoButton(); });
 
@@ -856,7 +883,7 @@
     $('restartButton').addEventListener('click', () => {
       // Reset the runaway button and the growing "Sim".
       state.noCount = 0;
-      noButton.classList.remove('escaping');
+      noButton.classList.remove('escaping', 'running');
       noButton.style.left = '';
       noButton.style.top = '';
       noButton.textContent = 'Não';
