@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080710">
+  <title>Um convite pra você ♡</title>
+
+  <!--
+    Link preview (WhatsApp, Instagram, etc.).
+    If the site moves to another URL, update the base URL here (og:url and og:image)
+    and in CONFIG.siteUrl inside the script at the bottom of this file.
+  -->
+  <meta name="description" content="tenho uma perguntinha pra você 🌙">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://johnggli.github.io/our-little-date/">
+  <meta property="og:title" content="Um convite pra você ♡">
+  <meta property="og:description" content="tenho uma perguntinha pra você 🌙">
+  <meta property="og:image" content="https://johnggli.github.io/our-little-date/assets/images/photo.jpg">
+  <meta property="og:locale" content="pt_BR">
+  <meta name="twitter:card" content="summary">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect rx='16' width='64' height='64' fill='%23080710'/%3E%3Cpath d='M40 12a20 20 0 1 0 12 32A16 16 0 0 1 40 12Z' fill='%23f3e3b0'/%3E%3C/svg%3E">
+
+  <style>
+    /* ===== Theme tokens (edit colors here) ===== */
+    :root {
+      --ink: #080710;
+      --panel: #12101f;
+      --purple: #9a6cff;
+      --blue: #63a8ff;
+      --pink: #ff5eaa;
+      --soft: #ffc6df;
+      --text: #fff9fd;
+      --muted: #c7bed5;
+      --line: rgba(255, 255, 255, .1);
+      --moon-light: #fffbe8;
+      --moon: #f3e3b0;
+      --moon-dark: #d9c48a;
+      --whatsapp: #25d366;
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --sans: "DM Sans", system-ui, sans-serif;
+      --script: "Caveat", cursive;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--ink);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button, input { font: inherit; }
+    button { touch-action: manipulation; }
+    [hidden] { display: none !important; }
+
+    /* ===== Background: aurora glow + floating symbols ===== */
+    .aurora {
+      position: fixed; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(154,108,255,.19), transparent 30%),
+        radial-gradient(circle at 85% 80%, rgba(255,94,170,.17), transparent 32%),
+        radial-gradient(circle at 75% 15%, rgba(99,168,255,.12), transparent 27%);
+      filter: blur(4px);
+    }
+    .sky { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+    .sky span {
+      position: absolute; color: var(--soft); opacity: .25;
+      font-size: clamp(12px, 1.4vw, 20px);
+      animation: drift 9s ease-in-out infinite;
+    }
+    @keyframes drift { 50% { transform: translateY(-18px) rotate(12deg); opacity: .7; } }
+
+    /* ===== Progress dots ===== */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+      display: flex; justify-content: center; gap: 8px;
+      padding: 18px 0 14px;
+      background: linear-gradient(rgba(8,7,16,.9), rgba(8,7,16,0));
+      transition: opacity .3s;
+    }
+    .progress.is-hidden { opacity: 0; pointer-events: none; }
+    .progress i {
+      width: 10px; height: 10px; border-radius: 99px; background: #403855;
+      transition: .3s;
+    }
+    .progress i.on {
+      width: 28px;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+      box-shadow: 0 0 16px rgba(255,94,170,.5);
+    }
+
+    /* ===== Screens ===== */
+    .screen {
+      display: none;
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+      padding: 64px 16px 96px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .screen.active { display: flex; animation: arrive .55s ease both; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .wrap { width: min(100%, 460px); display: flex; flex-direction: column; align-items: center; }
+
+    h1, h2 { font-family: var(--serif); font-weight: 600; margin: 0; }
+    h1 { font-size: clamp(2.4rem, 9vw, 3.4rem); line-height: 1; margin-bottom: 8px; }
+    h2 { font-size: clamp(1.7rem, 6.5vw, 2.2rem); line-height: 1.1; margin-bottom: 8px; }
+    p { color: var(--muted); line-height: 1.6; margin: 0 0 14px; }
+    .script { font: 600 clamp(1.25rem, 5vw, 1.55rem) var(--script); color: var(--soft); margin: 4px 0 18px; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px; margin-bottom: 18px;
+      border: 1px solid rgba(255,94,170,.25); background: rgba(255,94,170,.09);
+      border-radius: 99px; color: var(--soft);
+      font-size: .78rem; text-transform: uppercase; letter-spacing: .06em;
+    }
+
+    .card {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(27,23,47,.92), rgba(13,12,24,.92));
+      box-shadow: 0 24px 70px rgba(0,0,0,.34), inset 0 1px rgba(255,255,255,.06);
+      border-radius: 26px;
+      padding: 30px 22px;
+      display: flex; flex-direction: column; align-items: center;
+      animation: reveal .5s ease;
+    }
+    @keyframes reveal { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+
+    /* ===== Buttons ===== */
+    .btn {
+      border: 0; border-radius: 99px; padding: 15px 26px;
+      color: #fff; font-weight: 600; font-size: .98rem; letter-spacing: .02em;
+      cursor: pointer; transition: transform .25s, box-shadow .25s, opacity .25s, padding .3s, font-size .3s;
+    }
+    .btn-primary {
+      background: linear-gradient(100deg, var(--purple), var(--pink));
+      box-shadow: 0 10px 26px rgba(154,108,255,.22);
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 35px rgba(255,94,170,.3); }
+    .btn-secondary { background: transparent; border: 1px solid rgba(255,198,223,.35); color: var(--soft); }
+    .btn-whatsapp { background: var(--whatsapp); }
+    .btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+    .btn-full { width: 100%; margin-top: 22px; }
+    .stack { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+    .stack .btn { width: 100%; }
+
+    /* ===== 1. Opening: the moon ===== */
+    .moon {
+      position: relative;
+      width: min(52vw, 190px); aspect-ratio: 1; margin: 18px 0 26px;
+      border: 0; border-radius: 50%; padding: 0; cursor: pointer;
+      background: radial-gradient(circle at 35% 35%, var(--moon-light), var(--moon) 55%, var(--moon-dark));
+      box-shadow: 0 0 40px 10px rgba(255,240,190,.32), 0 0 120px 30px rgba(154,108,255,.22);
+      animation: moonPulse 3.2s ease-in-out infinite;
+    }
+    .moon:focus-visible { outline: 2px solid var(--soft); outline-offset: 8px; }
+    .moon i { position: absolute; border-radius: 50%; background: rgba(190,170,120,.33); box-shadow: inset 2px 2px 4px rgba(150,130,90,.25); }
+    .moon i:nth-child(1) { width: 15%; height: 15%; left: 26%; top: 25%; }
+    .moon i:nth-child(2) { width: 10%; height: 10%; left: 61%; top: 45%; }
+    .moon i:nth-child(3) { width: 12%; height: 12%; left: 38%; top: 64%; }
+    .moon i:nth-child(4) { width: 6%;  height: 6%;  left: 66%; top: 24%; }
+    @keyframes moonPulse {
+      50% {
+        transform: scale(1.06);
+        box-shadow: 0 0 60px 18px rgba(255,240,190,.45), 0 0 150px 45px rgba(154,108,255,.3);
+      }
+    }
+    .tap-hint { font: 600 1.35rem var(--script); color: var(--soft); }
+
+    /* ===== Music button ===== */
+    .music {
+      position: fixed; right: 18px; bottom: 18px; z-index: 30;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(18,16,31,.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--line); border-radius: 99px;
+      color: var(--soft); padding: 7px 16px 7px 7px; cursor: pointer;
+    }
+    .music span {
+      display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--pink)); color: #fff; font-size: 1.15rem;
+    }
+    .music em { font: 600 1.05rem var(--script); font-style: normal; }
+    .music.playing span { animation: musicPulse 1.4s infinite; }
+    .music.blocked em { display: inline !important; }
+    @keyframes musicPulse { 50% { box-shadow: 0 0 0 8px rgba(255,94,170,.12); } }
+
+    /* ===== 2. Invitation ===== */
+    .big-emoji { font-size: 2.6rem; line-height: 1; margin-bottom: 12px; }
+    .choice-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin-top: 8px; }
+    #noButton { white-space: normal; max-width: min(260px, calc(100vw - 30px)); line-height: 1.3; }
+    #noButton.escaping { position: fixed; z-index: 9999; margin: 0; transition: left .25s ease, top .25s ease; }
+    /* "Sim" grows each time she tries "Não" */
+    #convite[data-yes-step="1"] #yesButton { padding: 18px 32px; font-size: 1.1rem; }
+    #convite[data-yes-step="2"] #yesButton { padding: 21px 38px; font-size: 1.25rem; }
+    #convite[data-yes-step="3"] #yesButton { padding: 24px 44px; font-size: 1.42rem; }
+    #convite[data-yes-step="4"] #yesButton { padding: 27px 50px; font-size: 1.6rem; }
+    #convite[data-yes-step="5"] #yesButton { padding: 30px 56px; font-size: 1.8rem; }
+
+    /* ===== 3. Celebration ===== */
+    .photo {
+      width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+      border: 3px solid rgba(255,198,223,.5);
+      box-shadow: 0 0 30px rgba(255,94,170,.35);
+      margin-bottom: 18px;
+    }
+
+    /* ===== Falling things (confetti / emojis) ===== */
+    .falling {
+      position: fixed; top: -40px; z-index: 50; pointer-events: none;
+      animation: fall linear forwards;
+    }
+    .falling.piece { width: 8px; height: 13px; border-radius: 2px; }
+    .falling.emoji { font-size: 22px; }
+    @keyframes fall { to { transform: translateY(calc(100vh + 80px)) rotate(720deg); opacity: 0; } }
+
+    /* ===== 4. Calendar ===== */
+    .calendar {
+      width: 100%; background: rgba(18,16,31,.85); border: 1px solid var(--line);
+      border-radius: 22px; padding: 16px 14px;
+    }
+    .cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .cal-title { font: 600 1.3rem var(--serif); }
+    .cal-nav {
+      width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer;
+      background: rgba(154,108,255,.16); color: var(--soft); font-size: 1.2rem;
+    }
+    .cal-nav:disabled { opacity: .25; cursor: not-allowed; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-weekday { color: var(--pink); font-size: .7rem; text-transform: uppercase; padding: 4px 0; }
+    .cal-day {
+      aspect-ratio: 1; border: 0; border-radius: 12px; cursor: pointer;
+      background: rgba(255,255,255,.04); color: var(--text); font-size: .92rem;
+      transition: background .2s, box-shadow .2s;
+    }
+    .cal-day:disabled { opacity: .22; cursor: not-allowed; }
+    .cal-day.selected, .time.selected {
+      background: linear-gradient(135deg, var(--purple), var(--pink)); color: #fff; font-weight: 600;
+      box-shadow: 0 0 14px rgba(255,94,170,.5); border-color: transparent;
+    }
+    .label-script { font: 600 1.3rem var(--script); color: var(--soft); margin: 22px 0 10px; }
+    .times { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .time {
+      padding: 12px 0; border-radius: 14px; cursor: pointer;
+      border: 1px solid rgba(255,198,223,.25); background: transparent; color: var(--soft); font-size: .95rem;
+    }
+    .time:disabled { opacity: .22; cursor: not-allowed; }
+
+    /* ===== 5. Date type ===== */
+    .venues { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .venue {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      padding: 16px 10px; border-radius: 18px; cursor: pointer;
+      background: rgba(18,16,31,.85); border: 1px solid var(--line); color: var(--text);
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    .venue .emoji { font-size: 1.8rem; }
+    .venue strong { font-size: .95rem; }
+    .venue small { color: #a99fba; font-size: .78rem; line-height: 1.35; }
+    .venue[aria-pressed="true"] {
+      border-color: var(--pink);
+      background: linear-gradient(135deg, rgba(154,108,255,.25), rgba(255,94,170,.18));
+      box-shadow: 0 0 18px rgba(255,94,170,.3);
+    }
+    .other { width: 100%; margin-top: 14px; text-align: left; }
+    .other label { display: block; font: 600 1.25rem var(--script); color: var(--soft); margin-bottom: 6px; }
+    .other input {
+      width: 100%; padding: 14px; border-radius: 14px;
+      border: 1px solid rgba(255,198,223,.35); background: rgba(18,16,31,.9);
+      color: var(--text); font-size: 1rem; outline: none;
+    }
+    .other input:focus { border-color: var(--pink); }
+    .other input::placeholder { color: #8a809c; }
+
+    /* ===== 6. Final summary ===== */
+    .summary { width: 100%; background: rgba(18,16,31,.85); border: 1px solid var(--line); border-radius: 18px; padding: 4px 16px; }
+    .summary div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .summary div:last-child { border-bottom: 0; }
+    .summary span { color: var(--soft); white-space: nowrap; font-size: .92rem; }
+    .summary strong { text-align: right; overflow-wrap: anywhere; }
+    .final-note { margin: 18px 0 0; }
+
+    /* ===== Mobile ===== */
+    @media (max-width: 650px) {
+      .music em { display: none; }
+      .music { padding: 6px; right: 14px; bottom: 14px; }
+      .music span { width: 42px; height: 42px; }
+    }
+    @media (max-width: 340px) {
+      .venues { grid-template-columns: 1fr; }
+      .card { padding: 26px 16px; }
+    }
+
+    /* ===== Reduced motion ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="sky" id="sky" aria-hidden="true"></div>
+
+  <nav class="progress is-hidden" id="progress" aria-hidden="true"><i></i><i></i><i></i><i></i></nav>
+
+  <main>
+    <!-- 1. Opening -->
+    <section class="screen active" id="abertura">
+      <div class="wrap">
+        <span class="pill">✦ uma pergunta especial ✦</span>
+        <h1>Oi, Ana Vitória…</h1>
+        <p class="script">tenho uma perguntinha pra você</p>
+        <button class="moon" id="moonButton" aria-label="Toque na lua para ver o convite">
+          <i></i><i></i><i></i><i></i>
+        </button>
+        <span class="tap-hint">toque na lua para ver ♡</span>
+      </div>
+    </section>
+
+    <!-- 2. Invitation -->
+    <section class="screen" id="convite" data-step="1">
+      <div class="wrap">
+        <span class="pill">🌙 convite para um date</span>
+        <div class="card">
+          <div class="big-emoji" aria-hidden="true">🌙</div>
+          <h2>Quer sair comigo de novo?</h2>
+          <p>Só você e eu, um tempinho juntos, pra matar a saudade. ✨</p>
+          <div class="choice-row">
+            <button class="btn btn-primary" id="yesButton">Sim ♡</button>
+            <button class="btn btn-secondary" id="noButton">Não</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Celebration -->
+    <section class="screen" id="comemoracao" data-step="1">
+      <div class="wrap">
+        <div class="card">
+          <img class="photo" src="assets/images/photo.jpg" alt="dois gatinhos juntinhos">
+          <span class="pill">EBAAA!! VOCÊ DISSE SIM!</span>
+          <h2 tabindex="-1">Obrigado por dizer sim, meu bem 🥹💜.</h2>
+          <p class="script">eu tava torcendo muito por isso</p>
+          <p>Só quero um tempinho com você, rindo, conversando sobre qualquer coisa e criando mais uma lembrança boa juntos.</p>
+          <p class="script" style="margin-bottom:0">agora me ajuda a escolher os detalhes 🌙</p>
+          <button class="btn btn-primary btn-full" id="celebrationNext">CONTINUAR ♡</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Step 1 of 3: day and time -->
+    <section class="screen" id="dia" data-step="2">
+      <div class="wrap">
+        <span class="pill">📅 passo 1 de 3</span>
+        <h2>Escolha o nosso dia</h2>
+        <p>Escolha um dia que fique bom pra você. O resto deixa comigo. 💜</p>
+        <div class="calendar">
+          <div class="cal-head">
+            <button class="cal-nav" id="prevMonth" aria-label="Mês anterior">‹</button>
+            <span class="cal-title" id="monthTitle"></span>
+            <button class="cal-nav" id="nextMonth" aria-label="Próximo mês">›</button>
+          </div>
+          <div class="cal-grid" id="calendarGrid"></div>
+        </div>
+        <div class="label-script">e o horário ♡</div>
+        <div class="times" id="timesGrid"></div>
+        <button class="btn btn-primary btn-full" id="dayNext" disabled>CONTINUAR ♡</button>
+      </div>
+    </section>
+
+    <!-- 5. Step 2 of 3: date type -->
+    <section class="screen" id="tipo" data-step="3">
+      <div class="wrap">
+        <span class="pill">🍽️ passo 2 de 3</span>
+        <h2>Pra onde a gente vai?</h2>
+        <p>Escolha o tipo de date que você mais quer. 💜</p>
+        <div class="venues" id="venuesGrid"></div>
+        <div class="other" id="otherBox" hidden>
+          <label for="otherInput">qual a sua ideia? ♡</label>
+          <input id="otherInput" type="text" maxlength="120" autocomplete="off" placeholder="ex.: sorvete na praça, karaokê…">
+        </div>
+        <button class="btn btn-primary btn-full" id="venueNext" disabled>FINALIZAR NOSSO DATE ♡</button>
+      </div>
+    </section>
+
+    <!-- 6. Step 3 of 3: summary -->
+    <section class="screen" id="final" data-step="4">
+      <div class="wrap">
+        <span class="pill">💖 passo 3 de 3</span>
+        <h2>Então é um date! 🥰</h2>
+        <p>Agora eu tô oficialmente ansioso. Olha o nosso planinho:</p>
+        <div class="summary">
+          <div><span>📅 Dia</span><strong id="sumDate"></strong></div>
+          <div><span>⏰ Horário</span><strong id="sumTime"></strong></div>
+          <div><span>💫 Plano</span><strong id="sumPlan"></strong></div>
+        </div>
+        <p class="script final-note">Só falta você aparecer linda como sempre. O resto é comigo. 💜</p>
+        <div class="stack">
+          <button class="btn btn-whatsapp" id="whatsappButton">💚 Me mandar pelo WhatsApp</button>
+          <button class="btn btn-primary" id="copyButton">📋 Copiar o resumo</button>
+          <button class="btn btn-secondary" id="restartButton">↺ Recomeçar</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button class="music" id="musicButton" aria-label="Tocar ou pausar a música" hidden>
+    <span aria-hidden="true">♪</span><em id="musicLabel">Blue - yung kai</em>
+  </button>
+  <audio id="audio" loop preload="auto" src="assets/music/song.mp3"></audio>
+
+  <!-- ===== Config + pure logic (no DOM access) ===== -->
+  <script id="app-logic">
+    const CONFIG = {
+      // Base URL where the site is published (keep in sync with og:url / og:image above).
+      siteUrl: 'https://johnggli.github.io/our-little-date/',
+      // WhatsApp number that receives the answer: country code + area code + number, digits only.
+      whatsappNumber: '5586999412318',
+      // Time slots offered on the day/time step.
+      times: ['17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00'],
+      // Date options. Keep the id 'outro' for the free-text option.
+      venues: [
+        { id: 'jantar',     emoji: '🍷', name: 'Jantar romântico',       blurb: 'Comida boa, luz baixinha e só nós dois.' },
+        { id: 'italiano',   emoji: '🍝', name: 'Restaurante italiano',   blurb: 'Massa, pizza e uma conversa gostosa.' },
+        { id: 'cafe',       emoji: '☕', name: 'Cafezinho aconchegante', blurb: 'Café, um docinho e uma noite tranquila.' },
+        { id: 'cinema',     emoji: '🎬', name: 'Cinema + jantar',        blurb: 'Um filminho e depois um jantar.' },
+        { id: 'por-do-sol', emoji: '🌅', name: 'Pôr do sol',             blurb: 'O céu mudando de cor e a gente juntinho.' },
+        { id: 'outro',      emoji: '💭', name: 'Outro',                  blurb: 'Me conta onde você quer ir.' }
+      ],
+      // Texts the "Não" button cycles through while it runs away.
+      noMessages: [
+        'Tem certeza? 🥺',
+        'Pensa de novo 😭',
+        'Sério? 😢',
+        'Boa tentativa! 😏',
+        'Pensa duas vezes? 🥹',
+        'De novo?! 😂',
+        'Ainda tô aqui! ❤️',
+        'Tenta de novo 😏',
+        'Tem certeza absoluta? 🥺',
+        'Mais uma chance? ❤️',
+        'Ainda dizendo não? 😭',
+        'Você não quer mesmo um date? 😂',
+        'Por favorzinho? 🥹',
+        'Quase me pegou! 😏',
+        'Tá bom… mas eu continuo correndo ❤️'
+      ],
+      // Where the "Não" button jumps to, as [x%, y%] of the screen.
+      noPositions: [
+        [5, 10], [50, 10], [85, 10], [10, 25], [70, 25],
+        [30, 40], [85, 40], [5, 50], [50, 50], [90, 55],
+        [15, 70], [65, 70], [35, 82], [80, 85], [10, 88]
+      ],
+      // Emojis that fall on the final screen.
+      fallingEmojis: ['💜', '🌙', '✨', '💕', '⭐', '💖', '🥰', '💗'],
+      // Confetti colors for the celebration card.
+      confettiColors: ['#ff5eaa', '#9a6cff', '#63a8ff']
+    };
+
+    const MONTHS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+    const WEEKDAYS = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
+    const WEEKDAYS_SHORT = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+
+    function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+    function sameDay(a, b) { return startOfDay(a).getTime() === startOfDay(b).getTime(); }
+    function toMinutes(hhmm) { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; }
+
+    // e.g. 'sábado, 7 de novembro'
+    function formatDatePtBR(date) {
+      return `${WEEKDAYS[date.getDay()]}, ${date.getDate()} de ${MONTHS[date.getMonth()]}`;
+    }
+
+    // e.g. 'Novembro 2026'
+    function monthTitlePtBR(year, month0) {
+      const name = MONTHS[month0];
+      return `${name.charAt(0).toUpperCase()}${name.slice(1)} ${year}`;
+    }
+
+    // Time slots for a day; slots already past today are disabled.
+    function availableTimes(day, now) {
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      const isToday = sameDay(day, now);
+      return CONFIG.times.map(time => ({ time, disabled: isToday && toMinutes(time) <= nowMin }));
+    }
+
+    // A day is disabled if it is in the past, or today with every slot already gone.
+    function isDayDisabled(day, now) {
+      if (startOfDay(day) < startOfDay(now)) return true;
+      return availableTimes(day, now).every(t => t.disabled);
+    }
+
+    function findVenue(id) { return CONFIG.venues.find(v => v.id === id) || null; }
+
+    function isVenueValid(venueId, otherText) {
+      if (!findVenue(venueId)) return false;
+      if (venueId === 'outro') return (otherText || '').trim().length > 0;
+      return true;
+    }
+
+    function planLabel(venueId, otherText) {
+      if (venueId === 'outro') return (otherText || '').trim();
+      const v = findVenue(venueId);
+      return v ? v.name : '';
+    }
+
+    // The message she sends to WhatsApp (and copies).
+    function buildMessage({ date, time, venueId, otherText }) {
+      const v = findVenue(venueId);
+      const planLine = venueId === 'outro'
+        ? `💭 Minha ideia: ${planLabel(venueId, otherText)}`
+        : `💫 Plano: ${v.name} ${v.emoji}`;
+      return [
+        'Oii, meu bem! 🌙💜',
+        '',
+        'Eu aceitei o seu convite! 🥰✨',
+        '',
+        `📅 Dia: ${formatDatePtBR(date)}`,
+        `⏰ Horário: ${time}`,
+        planLine,
+        '',
+        'Já tô contando as horas pra te ver de novo 🥹💕'
+      ].join('\n');
+    }
+
+    function buildWhatsAppUrl(message) {
+      // Use api.whatsapp.com directly: the wa.me redirect mangles emojis into "�".
+      return `https://api.whatsapp.com/send?phone=${CONFIG.whatsappNumber}&text=${encodeURIComponent(message)}`;
+    }
+
+    // Next spot for the runaway "Não" button, always fully inside the screen.
+    function clampNoPosition(index, vw, vh, w, h) {
+      const margin = 15;
+      const [px, py] = CONFIG.noPositions[index % CONFIG.noPositions.length];
+      const x = Math.max(margin, Math.min((px / 100) * vw, vw - w - margin));
+      const y = Math.max(margin, Math.min((py / 100) * vh, vh - h - margin));
+      return { x, y };
+    }
+
+    // How much the "Sim" button has grown (0–5).
+    function yesStep(noCount) { return Math.min(noCount, 5); }
+  </script>
+
+  <!-- ===== UI wiring ===== -->
+  <script id="app-ui">
+    const $ = id => document.getElementById(id);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const state = {
+      noCount: 0,
+      date: null,
+      time: null,
+      venueId: null,
+      otherText: '',
+      calendarMonth: startOfDay(new Date())
+    };
+
+    /* ----- Background symbols ----- */
+    (function fillSky() {
+      const symbols = ['✦', '♡', '✦', '♡', '☾', '✧'];
+      const sky = $('sky');
+      for (let i = 0; i < 26; i++) {
+        const s = document.createElement('span');
+        s.textContent = symbols[i % symbols.length];
+        s.style.left = Math.random() * 96 + '%';
+        s.style.top = Math.random() * 96 + '%';
+        s.style.animationDelay = (Math.random() * 8) + 's';
+        s.style.animationDuration = (7 + Math.random() * 5) + 's';
+        sky.append(s);
+      }
+    })();
+
+    /* ----- Screen navigation ----- */
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+      const step = Number($(id).dataset.step || 0);
+      const progress = $('progress');
+      progress.classList.toggle('is-hidden', step === 0);
+      [...progress.children].forEach((dot, i) => dot.classList.toggle('on', i < step));
+      window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+    }
+
+    /* ----- Falling confetti / emojis ----- */
+    function launchFalling(count, decorate) {
+      if (reducedMotion) return;
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('span');
+        el.className = 'falling';
+        el.setAttribute('aria-hidden', 'true');
+        el.style.left = Math.random() * 100 + 'vw';
+        const duration = 2 + Math.random() * 2;
+        el.style.animationDuration = duration + 's';
+        el.style.animationDelay = Math.random() * 0.8 + 's';
+        decorate(el, i);
+        document.body.append(el);
+        setTimeout(() => el.remove(), (duration + 1) * 1000);
+      }
+    }
+
+    /* ----- Music ----- */
+    const audio = $('audio');
+    const musicButton = $('musicButton');
+    const musicLabel = $('musicLabel');
+
+    function playMusic() {
+      const p = audio.play();
+      const onOk = () => { musicButton.classList.remove('blocked'); musicLabel.textContent = 'Blue - yung kai'; };
+      // Autoplay blocked: show the hint even on phones, where the label is normally hidden.
+      const onFail = () => { musicButton.classList.add('blocked'); musicLabel.textContent = 'toque para ouvir'; };
+      if (p && p.then) p.then(onOk, onFail); else onOk();
+    }
+
+    musicButton.addEventListener('click', () => {
+      if (audio.paused) playMusic();
+      else audio.pause();
+    });
+    // Keep the pulse in sync with the real audio state (e.g. paused by the OS).
+    audio.addEventListener('play', () => musicButton.classList.add('playing'));
+    audio.addEventListener('pause', () => musicButton.classList.remove('playing'));
+
+    /* ----- 1. Opening ----- */
+    $('moonButton').addEventListener('click', () => {
+      // play() must run synchronously inside the tap for mobile autoplay rules.
+      playMusic();
+      musicButton.hidden = false;
+      showScreen('convite');
+    });
+
+    /* ----- 2. Invitation + runaway "Não" ----- */
+    const noButton = $('noButton');
+    const convite = $('convite');
+
+    function placeNoButton() {
+      const pos = clampNoPosition(state.noCount - 1, window.innerWidth, window.innerHeight, noButton.offsetWidth, noButton.offsetHeight);
+      noButton.style.left = pos.x + 'px';
+      noButton.style.top = pos.y + 'px';
+    }
+
+    noButton.addEventListener('click', event => {
+      event.preventDefault();
+      state.noCount++;
+      noButton.textContent = CONFIG.noMessages[(state.noCount - 1) % CONFIG.noMessages.length];
+      noButton.classList.add('escaping');
+      convite.dataset.yesStep = String(yesStep(state.noCount));
+      placeNoButton();
+    });
+
+    window.addEventListener('resize', () => { if (state.noCount > 0) placeNoButton(); });
+
+    $('yesButton').addEventListener('click', () => {
+      showScreen('comemoracao');
+      launchFalling(36, (el, i) => {
+        el.classList.add('piece');
+        el.style.background = CONFIG.confettiColors[i % CONFIG.confettiColors.length];
+      });
+    });
+
+    /* ----- 3. Celebration ----- */
+    $('celebrationNext').addEventListener('click', () => {
+      renderCalendar();
+      renderTimes();
+      showScreen('dia');
+    });
+
+    /* ----- 4. Day + time ----- */
+    function renderCalendar() {
+      const now = new Date();
+      const year = state.calendarMonth.getFullYear();
+      const month = state.calendarMonth.getMonth();
+      $('monthTitle').textContent = monthTitlePtBR(year, month);
+      $('prevMonth').disabled = year === now.getFullYear() && month === now.getMonth();
+
+      const grid = $('calendarGrid');
+      grid.innerHTML = '';
+      WEEKDAYS_SHORT.forEach(w => {
+        const el = document.createElement('span');
+        el.className = 'cal-weekday';
+        el.textContent = w;
+        grid.append(el);
+      });
+      const firstWeekday = new Date(year, month, 1).getDay();
+      for (let i = 0; i < firstWeekday; i++) grid.append(document.createElement('span'));
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const day = new Date(year, month, d);
+        const btn = document.createElement('button');
+        btn.className = 'cal-day';
+        btn.textContent = d;
+        btn.setAttribute('aria-label', formatDatePtBR(day));
+        btn.disabled = isDayDisabled(day, now);
+        if (state.date && sameDay(day, state.date)) btn.classList.add('selected');
+        btn.addEventListener('click', () => {
+          state.date = day;
+          renderCalendar();
+          renderTimes();
+        });
+        grid.append(btn);
+      }
+    }
+
+    function renderTimes() {
+      const grid = $('timesGrid');
+      grid.innerHTML = '';
+      const slots = state.date
+        ? availableTimes(state.date, new Date())
+        : CONFIG.times.map(time => ({ time, disabled: false }));
+      // Drop a chosen time that is no longer available.
+      if (state.time && slots.some(s => s.time === state.time && s.disabled)) state.time = null;
+      slots.forEach(({ time, disabled }) => {
+        const btn = document.createElement('button');
+        btn.className = 'time';
+        btn.textContent = time;
+        btn.disabled = disabled;
+        if (time === state.time) btn.classList.add('selected');
+        btn.addEventListener('click', () => { state.time = time; renderTimes(); });
+        grid.append(btn);
+      });
+      $('dayNext').disabled = !(state.date && state.time);
+    }
+
+    function resetDayStep() {
+      state.date = null;
+      state.time = null;
+      state.calendarMonth = startOfDay(new Date());
+      renderCalendar();
+      renderTimes();
+    }
+
+    $('prevMonth').addEventListener('click', () => {
+      state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() - 1, 1);
+      renderCalendar();
+    });
+    $('nextMonth').addEventListener('click', () => {
+      state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + 1, 1);
+      renderCalendar();
+    });
+    $('dayNext').addEventListener('click', () => {
+      if (!(state.date && state.time)) return;
+      // The clock may have moved on since the choice was made: re-validate.
+      const now = new Date();
+      const slot = availableTimes(state.date, now).find(s => s.time === state.time);
+      if (isDayDisabled(state.date, now) || !slot || slot.disabled) {
+        if (isDayDisabled(state.date, now)) state.date = null;
+        state.time = null;
+        renderCalendar();
+        renderTimes();
+        return;
+      }
+      showScreen('tipo');
+    });
+
+    /* ----- 5. Date type ----- */
+    const venuesGrid = $('venuesGrid');
+    const otherBox = $('otherBox');
+    const otherInput = $('otherInput');
+
+    function updateVenueButton() {
+      $('venueNext').disabled = !isVenueValid(state.venueId, state.otherText);
+    }
+
+    function renderVenues() {
+      venuesGrid.innerHTML = '';
+      CONFIG.venues.forEach(v => {
+        const btn = document.createElement('button');
+        btn.className = 'venue';
+        btn.setAttribute('aria-pressed', String(state.venueId === v.id));
+        const emoji = document.createElement('span');
+        emoji.className = 'emoji';
+        emoji.textContent = v.emoji;
+        const name = document.createElement('strong');
+        name.textContent = v.name;
+        const blurb = document.createElement('small');
+        blurb.textContent = v.blurb;
+        btn.append(emoji, name, blurb);
+        btn.addEventListener('click', () => {
+          state.venueId = v.id;
+          renderVenues();
+          otherBox.hidden = v.id !== 'outro';
+          if (v.id === 'outro') otherInput.focus();
+          updateVenueButton();
+        });
+        venuesGrid.append(btn);
+      });
+    }
+    renderVenues();
+
+    otherInput.addEventListener('input', () => {
+      state.otherText = otherInput.value;
+      updateVenueButton();
+    });
+
+    $('venueNext').addEventListener('click', () => {
+      if (!isVenueValid(state.venueId, state.otherText)) return;
+      $('sumDate').textContent = formatDatePtBR(state.date);
+      $('sumTime').textContent = state.time;
+      $('sumPlan').textContent = planLabel(state.venueId, state.otherText);
+      showScreen('final');
+      launchFalling(70, el => {
+        el.classList.add('emoji');
+        el.textContent = CONFIG.fallingEmojis[Math.floor(Math.random() * CONFIG.fallingEmojis.length)];
+      });
+    });
+
+    /* ----- 6. Final: WhatsApp / copy / restart ----- */
+    function currentMessage() {
+      return buildMessage({ date: state.date, time: state.time, venueId: state.venueId, otherText: state.otherText });
+    }
+
+    $('whatsappButton').addEventListener('click', () => {
+      const url = buildWhatsAppUrl(currentMessage());
+      const win = window.open(url, '_blank');
+      if (!win) window.location.href = url;
+    });
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.append(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      ta.remove();
+      return ok;
+    }
+
+    const copyButton = $('copyButton');
+    const copyLabel = copyButton.textContent;
+    copyButton.addEventListener('click', async () => {
+      const text = currentMessage();
+      let ok = false;
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch (e) {
+        ok = fallbackCopy(text);
+      }
+      copyButton.textContent = ok ? 'Copiado! 💜' : 'Não deu pra copiar 🥺';
+      setTimeout(() => { copyButton.textContent = copyLabel; }, 2000);
+    });
+
+    $('restartButton').addEventListener('click', () => {
+      // Reset the runaway button and the growing "Sim".
+      state.noCount = 0;
+      noButton.classList.remove('escaping');
+      noButton.style.left = '';
+      noButton.style.top = '';
+      noButton.textContent = 'Não';
+      delete convite.dataset.yesStep;
+      // Reset choices.
+      state.venueId = null;
+      state.otherText = '';
+      otherInput.value = '';
+      otherBox.hidden = true;
+      renderVenues();
+      updateVenueButton();
+      resetDayStep();
+      // Music keeps playing.
+      showScreen('abertura');
+    });
+  </script>
+</body>
+</html>
