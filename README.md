@@ -117,7 +117,7 @@ If you publish under a different address, update the base URL in **two places**:
 
 ## Good to know
 
-- **Music on phones:** mobile browsers only allow audio to start from a tap, which is why the music begins when the moon is tapped. If a browser still blocks it, the music button shows "toque para ouvir" and plays on tap.
+- **Music on phones:** mobile browsers only allow audio to start from a tap, which is why the music begins when the moon is tapped. If a browser still blocks it, the music button shows "toque para ouvir" (also on phones) and plays on tap.
 - **Link preview cache:** WhatsApp caches previews. If you change the title, text or image after sharing the link once, the old preview may stick around for a while. Adding a query string (e.g. `?v=2`) to the shared link forces a fresh preview.
 - **Reduced motion:** if the device asks for reduced motion, the floating, pulsing and falling animations are turned off.
 - **No data is stored or sent anywhere.** The only thing that leaves the page is the WhatsApp message, and only when the button is tapped.
