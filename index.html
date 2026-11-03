@@ -350,9 +350,9 @@
       <div class="wrap">
         <div class="card">
           <img class="photo" src="assets/images/photo.jpg" alt="dois gatinhos juntinhos">
-          <span class="pill">EBAAA!! VOCÊ DISSE SIM! 🥹💜</span>
-          <h2 tabindex="-1">Obrigado por dizer sim, meu bem.</h2>
-          <p class="script">eu tava torcendo muito por esse sim</p>
+          <span class="pill">EBAAA!! VOCÊ DISSE SIM!</span>
+          <h2 tabindex="-1">Obrigado por dizer sim, meu bem 🥹💜.</h2>
+          <p class="script">eu tava torcendo muito por isso</p>
           <p>Só quero um tempinho com você, rindo, conversando sobre qualquer coisa e criando mais uma lembrança boa juntos.</p>
           <p class="script" style="margin-bottom:0">agora me ajuda a escolher os detalhes 🌙</p>
           <button class="btn btn-primary btn-full" id="celebrationNext">CONTINUAR ♡</button>
@@ -535,7 +535,8 @@
     }
 
     function buildWhatsAppUrl(message) {
-      return `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+      // Use api.whatsapp.com directly: the wa.me redirect mangles emojis into "�".
+      return `https://api.whatsapp.com/send?phone=${CONFIG.whatsappNumber}&text=${encodeURIComponent(message)}`;
     }
 
     // Next spot for the runaway "Não" button, always fully inside the screen.
